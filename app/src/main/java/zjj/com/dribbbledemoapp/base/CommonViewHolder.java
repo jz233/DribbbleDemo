@@ -92,4 +92,9 @@ public class CommonViewHolder extends RecyclerView.ViewHolder {
         return this;
     }
 
+    public CommonViewHolder setOnViewClickListener(View.OnClickListener listener) {
+        mConvertView.setOnClickListener(listener);
+        return this;
+    }
+
 }

@@ -22,6 +22,9 @@ public class Constants {
     public final static String METHOD_POST = "POST";
     public final static String METHOD_DELETE = "DELETE";
 
-
+    public final static String REQ_TAG_CHECK_IF_LIKE_SHOT = "REQ_TAG_CHECK_IF_LIKE_SHOT";
+    public final static String REQ_TAG_CHECK_IF_LIKE_COMMENT = "REQ_TAG_CHECK_IF_LIKE_COMMENT";
+    public final static String REQ_TAG_LIKE_COMMENT = "REQ_TAG_LIKE_COMMENT";
+    public final static String REQ_TAG_UNLIKE_COMMENT = "REQ_TAG_UNLIKE_COMMENT";
 
 }

@@ -161,10 +161,10 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
             public void run() {
                 if (flag) {
                     fab_like.setBackgroundTintList(getResources().getColorStateList(R.color.liked));
-                    fab_like.setImageResource(R.drawable.ic_liked);
+                    fab_like.setImageResource(R.drawable.ic_fab_liked);
                 } else {
                     fab_like.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
-                    fab_like.setImageResource(R.drawable.ic_unlike);
+                    fab_like.setImageResource(R.drawable.ic_fab_unlike);
                 }
             }
         });
