@@ -1,4 +1,4 @@
-package zjj.com.dribbbledemoapp.base;
+package zjj.com.dribbbledemoapp.adapters.base;
 
 import android.content.Context;
 import android.support.annotation.DrawableRes;

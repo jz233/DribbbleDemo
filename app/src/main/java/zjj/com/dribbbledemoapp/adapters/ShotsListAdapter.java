@@ -5,14 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -33,9 +37,13 @@ public class ShotsListAdapter extends RecyclerView.Adapter{
     private List<Shot> shotsList;
     private int totalCount;
     private int lastVisiblePosition;
-    private boolean isLoading;
+    private boolean isLoading = false;
     private final int threshold = 2;
+    private int previousTotalCount;
     private OnLoadMoreListener listener;
+    private int currentPage = 1;
+    private int firstVisiblePosition;
+    private int visibleItemCount;
 
     public ShotsListAdapter(Context context, List<Shot> shotsList) {
         this.context = context;
@@ -55,14 +63,21 @@ public class ShotsListAdapter extends RecyclerView.Adapter{
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+
                 totalCount = layoutManager.getItemCount();
-                lastVisiblePosition = layoutManager.findLastVisibleItemPosition();  //position比count小1
-                if (!isLoading && lastVisiblePosition >= (totalCount - threshold - 1)) {
+                visibleItemCount = recyclerView.getChildCount();
+                firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+//                lastVisiblePosition = layoutManager.findLastVisibleItemPosition();  //position比count小1
+
+                if (!isLoading && (firstVisiblePosition+visibleItemCount + threshold)>= totalCount) {
                     isLoading = true;
-                    if (listener != null) {
-                        listener.onLoadMore();
-                    }
+                    previousTotalCount = totalCount;
+                    listener.onLoadMore(++currentPage);
                 }
+                if (isLoading && (totalCount > previousTotalCount)) {
+                    isLoading = false;
+                }
+
             }
         });
     }
@@ -84,17 +99,45 @@ public class ShotsListAdapter extends RecyclerView.Adapter{
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ShotsViewHolder) {
             Shot shot = shotsList.get(position);
-            ShotsViewHolder sHolder = (ShotsViewHolder) holder;
-//            Glide.with(context).load(shots.getImages().getNormal()).asBitmap().placeholder(R.drawable.img_default).into(sHolder.shots_thumb);
-//            Glide.with(context).load(shots.getUser().getAvatar_url()).asBitmap().placeholder(R.drawable.default_avatar).into(sHolder.shots_user_avatar);
-
-            Picasso.with(context).load(shot.getImages().getNormal()).placeholder(R.drawable.placeholder).error(R.drawable.placeholder).into(sHolder.shots_thumb);
-            Picasso.with(context).load(shot.getUser().getAvatar_url()).placeholder(R.drawable.default_avatar).error(R.drawable.default_avatar).into(sHolder.shots_user_avatar);
+            final ShotsViewHolder sHolder = (ShotsViewHolder) holder;
             sHolder.shots_title.setText(shot.getTitle());
             sHolder.shots_user.setText(shot.getUser().getName());
             sHolder.shots_views_count.setText(String.valueOf(shot.getViews_count()));
             sHolder.shots_comments_count.setText(String.valueOf(shot.getComments_count()));
             sHolder.shots_likes_count.setText(String.valueOf(shot.getLikes_count()));
+
+//            Glide.with(context).load(shots.getImages().getNormal()).asBitmap().placeholder(R.drawable.img_default).into(sHolder.shots_thumb);
+//            Glide.with(context).load(shots.getUser().getAvatar_url()).asBitmap().placeholder(R.drawable.default_avatar).into(sHolder.shots_user_avatar);
+
+            Picasso.with(context).load(shot.getImages().getNormal())
+                    .placeholder(R.drawable.placeholder).error(R.drawable.placeholder)
+                    .into(sHolder.shots_thumb, new Callback() {
+                @Override
+                public void onSuccess() {
+
+                }
+
+                @Override
+                public void onError() {
+                    Toast.makeText(context, "loading pic error", Toast.LENGTH_SHORT).show();
+                    Picasso.with(context).cancelRequest(sHolder.shots_thumb);
+                }
+            });
+            Picasso.with(context).load(shot.getUser().getAvatar_url())
+                    .placeholder(R.drawable.default_avatar).error(R.drawable.default_avatar)
+                    .into(sHolder.shots_user_avatar, new Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError() {
+                            Toast.makeText(context, "loading avatar error", Toast.LENGTH_SHORT).show();
+                            Picasso.with(context).cancelRequest(sHolder.shots_thumb);
+                        }
+                    });
+
         } else if (holder instanceof LoadingViewHolder) {
             LoadingViewHolder lHolder = (LoadingViewHolder) holder;
         }

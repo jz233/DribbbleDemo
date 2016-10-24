@@ -2,13 +2,19 @@ package zjj.com.dribbbledemoapp.applications;
 
 
 import android.app.Application;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
+import android.widget.Toast;
 
 
 import com.jakewharton.picasso.OkHttp3Downloader;
+import com.squareup.leakcanary.LeakCanary;
 import com.squareup.picasso.Picasso;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,10 +37,23 @@ public class AppController extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            return;
+        }
+        LeakCanary.install(this);
+
         instance = this;
 //        Glide.get(this).register(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(getClient()));
+//        EventBus.builder().throwSubscriberException(true).installDefaultEventBus();
+        Picasso picasso = new Picasso.Builder(instance).downloader(new OkHttp3Downloader(getClient())).listener(new Picasso.Listener() {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                Toast.makeText(AppController.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }).build();
+        Picasso.setSingletonInstance(picasso);
+//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
 
-        Picasso.setSingletonInstance(new Picasso.Builder(instance).downloader(new OkHttp3Downloader(getClient())).build());
     }
 
     public static synchronized AppController getInstance() {

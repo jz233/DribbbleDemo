@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/brightGray"
     tools:context="zjj.com.dribbbledemoapp.activities.DetailsActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -15,11 +16,11 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:contentScrim="?attr/colorPrimary"
             android:background="@color/brightGray"
-            app:titleEnabled="false"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:statusBarScrim="@android:color/transparent">
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:statusBarScrim="@android:color/transparent"
+            app:titleEnabled="false">
 
             <ImageView
                 android:id="@+id/iv_detail_image"
@@ -45,13 +46,54 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/brightGray"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <include layout="@layout/layout_details" />
 
     </android.support.v4.widget.NestedScrollView>
+
+    <!--底部菜单-->
+    <RelativeLayout
+        android:id="@+id/rl_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/brightGray"
+        android:elevation="@dimen/z_bottom_sheet"
+        android:gravity="center_vertical"
+        android:minHeight="55dp"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="55dp"
+        app:layout_behavior="@string/bottom_sheet_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_comment"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="16dp"
+                android:layout_weight="1"
+                android:text="Comment"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/btn_bucket"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="32dp"
+                android:layout_weight="1"
+                android:text="Bucket"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+    </RelativeLayout>
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_like"
@@ -60,6 +102,6 @@
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_fab_unlike"/>
+        app:srcCompat="@drawable/ic_fab_unlike" />
 
 </android.support.design.widget.CoordinatorLayout>

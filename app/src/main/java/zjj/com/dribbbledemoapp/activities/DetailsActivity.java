@@ -3,14 +3,18 @@ package zjj.com.dribbbledemoapp.activities;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.text.Spanned;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +50,9 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
     private Shot shot;
     private boolean isLiked;
     private Button btn_comment;
+    private RelativeLayout rl_bottom_sheet;
+    private BottomSheetBehavior<RelativeLayout> behavior;
+    private boolean loadSuccess = false;
 
     @Override
     public void initView() {
@@ -60,16 +67,38 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
         fab_like = (FloatingActionButton) findViewById(R.id.fab_like);
         tv_description = (TextView) findViewById(R.id.tv_description);
         btn_comment = (Button) findViewById(R.id.btn_comment);
+        rl_bottom_sheet = (RelativeLayout) findViewById(R.id.rl_bottom_sheet);
 
         setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        behavior = BottomSheetBehavior.from(rl_bottom_sheet);
+        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
     }
 
     @Override
     public void initListener() {
         fab_like.setOnClickListener(this);
+        iv_detail_image.setOnClickListener(this);
         tv_user_name.setOnClickListener(this);
         iv_user_avatar.setOnClickListener(this);
         btn_comment.setOnClickListener(this);
+
+        //禁止bottom sheet拖动
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+                    behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+            }
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
     }
 
     @Override
@@ -99,7 +128,7 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    displayData(shot);
+                                    displayData();
                                 }
                             });
                         }
@@ -107,28 +136,22 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
         }
 
     }
-    private void displayData(Shot body) {
-        setTitle(body.getTitle());
-//        Glide.with(this).load(body.getImages().getHidpi()).asBitmap().into(iv_detail_image);
-//        Glide.with(this).load(body.getUser().getAvatar_url()).asBitmap().into(iv_user_avatar);
-        Picasso.with(this).load(body.getImages().getHidpi()).error(R.drawable.placeholder).tag("image").into(iv_detail_image);
-        Picasso.with(this).load(body.getUser().getAvatar_url()).error(R.drawable.default_avatar).tag("image").into(iv_user_avatar);
-        tv_user_name.setText(body.getUser().getName());
-        Spanned html = Html.fromHtml(body.getDescription());
-        if (!TextUtils.isEmpty(html))
-            tv_description.setText(html);
+    private void displayData() {
+        setTitle(shot.getTitle());
+        loadImage();
+        Picasso.with(this).load(shot.getUser().getAvatar_url()).error(R.drawable.default_avatar).tag("avatar").into(iv_user_avatar);
+        tv_user_name.setText(shot.getUser().getName());
+        String description = shot.getDescription();
+        if (!TextUtils.isEmpty(description))
+            tv_description.setText(Html.fromHtml(description));
 
-        String dateTime = body.getUpdated_at();
+        String dateTime = shot.getUpdated_at();
         if (!TextUtils.isEmpty(dateTime)) {
             tv_update_time.setText(DateTimeUtils.parseDateTime(dateTime));
         }
 
-        //默认就是这样显示
-//        fab_like.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
-//        fab_like.setImageResource(R.drawable.ic_like);
-
 //        GET /shots/:id/like
-        checkIfLike(String.valueOf(body.getId()));
+        checkIfLike(String.valueOf(shot.getId()));
 
     }
 
@@ -229,6 +252,33 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
             case R.id.btn_comment:
                 startCommentActivity();
                 break;
+            case R.id.iv_detail_image:
+                loadImage();
+                break;
+        }
+    }
+
+    private void loadImage() {
+        if (!loadSuccess) {
+            Toast.makeText(context, "reload", Toast.LENGTH_SHORT).show();
+            Picasso.with(this).load(shot.getImages().getHidpi())
+                    .error(R.drawable.placeholder).tag("image")
+                    .into(iv_detail_image, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            loadSuccess = true;
+                            Toast.makeText(context, "load success", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onError() {
+                            loadSuccess = false;
+                            Picasso.with(context).cancelRequest(iv_detail_image);
+                            Toast.makeText(context, "load error", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }else{
+            Toast.makeText(context, "succeed", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -264,5 +314,16 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
         }
         //取消图片下载请求
         Picasso.with(this).cancelTag("image");
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (android.R.id.home == itemId) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

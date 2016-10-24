@@ -54,8 +54,7 @@ public class ShotsListFragment extends BaseFragment {
 
         View view = inflater.inflate(R.layout.fragment_art_list, null);
         swipe_refresh = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
-        swipe_refresh.setColorSchemeColors(getResources().getColor(R.color.colorPrimary), getResources().getColor(R.color.colorAccent));
-//        swipe_refresh.setColorSchemeResources(R.color.colorPrimary);
+        swipe_refresh.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
         rv_art_list = (RecyclerView) view.findViewById(R.id.rv_art_list);
         rv_art_list.setLayoutManager(new GridLayoutManager(context, 2));
 
@@ -106,62 +105,60 @@ public class ShotsListFragment extends BaseFragment {
                             public void run() {
                                 swipe_refresh.setRefreshing(false);
                                 adapter = new ShotsListAdapter(context, results);
+                                //下拉读取更多
+                                addInfiniteScrollingListener();
+                                //设置适配器
                                 rv_art_list.setAdapter(adapter);
-                                addAdapterListener();
                             }
                         });
                     }
                 });
     }
 
-    private void addAdapterListener() {
+    private void addInfiniteScrollingListener() {
         adapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
-            public void onLoadMore() {
-                mainHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        params.put("page", String.valueOf(++currentPage));
-                        //列表最下方添加进度条View
-                        results.add(null);
-                        adapter.notifyItemInserted(results.size() - 1);
-                        //网络请求读取下一页
-                        AppController.getInstance().enqueueGetRequest(
-                                new String[]{Constants.SHOTS},
-                                params,
-                                "more",
-                                new Callback() {
+            public void onLoadMore(final int currentPage) {
+                params.put("page", String.valueOf(currentPage));
+//                        //列表最下方添加进度条View
+//                        results.add(null);
+//                        adapter.notifyItemInserted(results.size() - 1);
+                //网络请求读取下一页
+                AppController.getInstance().enqueueGetRequest(
+                        new String[]{Constants.SHOTS},
+                        params,
+                        "more",
+                        new Callback() {
+                            @Override
+                            public void onFailure(Call call, IOException e) {
+                                mainHandler.post(new Runnable() {
                                     @Override
-                                    public void onFailure(Call call, IOException e) {
-                                        mainHandler.post(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                    }
-                                    @Override
-                                    public void onResponse(Call call, Response response) throws IOException {
-                                        final String body = response.body().string();
-                                        mainHandler.post(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                results.remove(results.size() - 1);
-                                                adapter.notifyItemRemoved(results.size());  //此时size()已经减少1
-
-                                                Shot[] list = new Gson().fromJson(body, Shot[].class);
-                                                List<Shot> incResults = Arrays.asList(list);
-                                                results.addAll(incResults);
-                                                adapter.setLoading(false);
-                                            }
-                                        });
+                                    public void run() {
+                                        Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                    }
-                });
+                            }
 
+                            @Override
+                            public void onResponse(Call call, Response response) throws IOException {
+                                final String body = response.body().string();
+                                mainHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+//                                                results.remove(results.size() - 1);
+//                                                adapter.notifyItemRemoved(results.size());  //此时size()已经减少1
+
+                                        Shot[] list = new Gson().fromJson(body, Shot[].class);
+                                        List<Shot> incResults = Arrays.asList(list);
+                                        results.addAll(incResults);
+                                        adapter.setLoading(false);
+                                    }
+                                });
+                            }
+                        });
             }
         });
+
     }
 
 }

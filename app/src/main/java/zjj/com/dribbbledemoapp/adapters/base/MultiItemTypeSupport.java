@@ -1,4 +1,4 @@
-package zjj.com.dribbbledemoapp.base;
+package zjj.com.dribbbledemoapp.adapters.base;
 
 
 public interface MultiItemTypeSupport<T> {
