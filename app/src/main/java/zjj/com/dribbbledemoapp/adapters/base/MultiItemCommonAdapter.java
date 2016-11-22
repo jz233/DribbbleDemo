@@ -15,13 +15,13 @@ public abstract class MultiItemCommonAdapter<T> extends CommonAdapter<T> {
 
     @Override
     public int getItemViewType(int position) {
-        return mSupport.getItemViewType(position, mData.get(position));
+        return mSupport.getItemViewType(position, data.get(position));
     }
 
     @Override
     public CommonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         int layoutId = mSupport.getLayoutId(viewType);
-        CommonViewHolder holder = CommonViewHolder.getViewHolder(mContext, layoutId, parent);
+        CommonViewHolder holder = CommonViewHolder.getViewHolder(context, layoutId, parent);
         return holder;
     }
 }

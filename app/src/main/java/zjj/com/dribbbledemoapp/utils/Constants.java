@@ -12,6 +12,7 @@ public class Constants {
     public final static String CLIENT_HOST = "api.dribbble.com";
     public final static String CLIENT_VERSION = "v1";
     public final static String SHOTS = "shots";
+    public final static String USERS = "users";
     public final static String COMMENTS = "comments";
     public final static String LIKE = "like";
     public final static String PAGE = "page";
@@ -21,6 +22,9 @@ public class Constants {
     public final static String METHOD_GET = "GET";
     public final static String METHOD_POST = "POST";
     public final static String METHOD_DELETE = "DELETE";
+
+    public final static String USERS_SHOTS = "USERS_SHOTS";
+
 
     public final static String REQ_TAG_CHECK_IF_LIKE_SHOT = "REQ_TAG_CHECK_IF_LIKE_SHOT";
     public final static String REQ_TAG_CHECK_IF_LIKE_COMMENT = "REQ_TAG_CHECK_IF_LIKE_COMMENT";

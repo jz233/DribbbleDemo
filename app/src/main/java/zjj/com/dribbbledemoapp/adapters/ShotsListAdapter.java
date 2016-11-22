@@ -106,9 +106,6 @@ public class ShotsListAdapter extends RecyclerView.Adapter{
             sHolder.shots_comments_count.setText(String.valueOf(shot.getComments_count()));
             sHolder.shots_likes_count.setText(String.valueOf(shot.getLikes_count()));
 
-//            Glide.with(context).load(shots.getImages().getNormal()).asBitmap().placeholder(R.drawable.img_default).into(sHolder.shots_thumb);
-//            Glide.with(context).load(shots.getUser().getAvatar_url()).asBitmap().placeholder(R.drawable.default_avatar).into(sHolder.shots_user_avatar);
-
             Picasso.with(context).load(shot.getImages().getNormal())
                     .placeholder(R.drawable.placeholder).error(R.drawable.placeholder)
                     .into(sHolder.shots_thumb, new Callback() {
@@ -197,6 +194,7 @@ public class ShotsListAdapter extends RecyclerView.Adapter{
                     Intent intent = new Intent(context, UserActivity.class);
                     Shot shot = shotsList.get(getAdapterPosition());
                     intent.putExtra("userId", shot.getUser().getId());
+                    intent.putExtra("name", shot.getUser().getName());
                     context.startActivity(intent);
                 }
             });

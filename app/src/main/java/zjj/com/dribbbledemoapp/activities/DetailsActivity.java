@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -62,7 +63,7 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         iv_detail_image = (ImageView) findViewById(R.id.iv_detail_image);
         iv_user_avatar = (CircleImageView) findViewById(R.id.iv_user_avatar);
-        tv_user_name = (TextView) findViewById(R.id.tv_user_name);
+        tv_user_name = (TextView) findViewById(R.id.tv_name);
         tv_update_time = (TextView) findViewById(R.id.tv_update_time);
         fab_like = (FloatingActionButton) findViewById(R.id.fab_like);
         tv_description = (TextView) findViewById(R.id.tv_description);
@@ -138,7 +139,12 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
     }
     private void displayData() {
         setTitle(shot.getTitle());
+
         loadImage();
+        loadInfo();
+    }
+
+    private void loadInfo() {
         Picasso.with(this).load(shot.getUser().getAvatar_url()).error(R.drawable.default_avatar).tag("avatar").into(iv_user_avatar);
         tv_user_name.setText(shot.getUser().getName());
         String description = shot.getDescription();
@@ -152,7 +158,6 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
 
 //        GET /shots/:id/like
         checkIfLike(String.valueOf(shot.getId()));
-
     }
 
     private void checkIfLike(String id) {
@@ -243,7 +248,7 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
             case R.id.fab_like:
                 enqueueLikeRequest();
                 break;
-            case R.id.tv_user_name:
+            case R.id.tv_name:
                 startUserActivity();
                 break;
             case R.id.iv_user_avatar:
@@ -258,27 +263,45 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
         }
     }
 
-    private void loadImage() {
-        if (!loadSuccess) {
-            Toast.makeText(context, "reload", Toast.LENGTH_SHORT).show();
-            Picasso.with(this).load(shot.getImages().getHidpi())
-                    .error(R.drawable.placeholder).tag("image")
-                    .into(iv_detail_image, new com.squareup.picasso.Callback() {
-                        @Override
-                        public void onSuccess() {
-                            loadSuccess = true;
-                            Toast.makeText(context, "load success", Toast.LENGTH_SHORT).show();
-                        }
+    private String getImageUrl() {
+        String imgUrl = shot.getImages().getHidpi();
+        if(TextUtils.isEmpty(imgUrl)){
+            imgUrl = shot.getImages().getNormal();
+            if (TextUtils.isEmpty(imgUrl)) {
+                imgUrl = shot.getImages().getTeaser();
+                if (TextUtils.isEmpty(imgUrl)) {
+                    return null;
+                }
+            }
+        }
+        return imgUrl;
+    }
 
-                        @Override
-                        public void onError() {
-                            loadSuccess = false;
-                            Picasso.with(context).cancelRequest(iv_detail_image);
-                            Toast.makeText(context, "load error", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+    private void loadImage() {
+        String imageUrl = getImageUrl();
+        if (!TextUtils.isEmpty(imageUrl)) {
+            if (!loadSuccess) {
+                Picasso.with(this).load(imageUrl)
+                        .error(R.drawable.placeholder).tag("image")
+                        .into(iv_detail_image, new com.squareup.picasso.Callback() {
+                            @Override
+                            public void onSuccess() {
+                                loadSuccess = true;
+                                Toast.makeText(context, "load success", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError() {
+                                loadSuccess = false;
+                                Picasso.with(context).cancelRequest(iv_detail_image);
+                                Toast.makeText(context, "load error", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }else{
+                Toast.makeText(context, "succeed", Toast.LENGTH_SHORT).show();
+            }
         }else{
-            Toast.makeText(context, "succeed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Image Url is null", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -286,6 +309,7 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
     private void startUserActivity() {
         Intent intent = new Intent(this, UserActivity.class);
         intent.putExtra("userId", shot.getUser().getId());
+        intent.putExtra("name", shot.getUser().getName());
         startActivity(intent);
     }
 

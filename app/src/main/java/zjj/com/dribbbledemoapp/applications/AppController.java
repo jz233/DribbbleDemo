@@ -37,10 +37,10 @@ public class AppController extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (LeakCanary.isInAnalyzerProcess(this)) {
+       /* if (LeakCanary.isInAnalyzerProcess(this)) {
             return;
         }
-        LeakCanary.install(this);
+        LeakCanary.install(this);*/
 
         instance = this;
 //        Glide.get(this).register(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(getClient()));
@@ -75,6 +75,9 @@ public class AppController extends Application {
         return client;
     }
 
+    public void enqueueGetRequest(String[] patterns, String tag, Callback callBack){
+        enqueueGetRequest(patterns, null, tag, callBack);
+    }
 
     public void enqueueGetRequest(String[] patterns, HashMap<String, String> params, String tag, Callback callBack) {
         String url = buildUrl(Constants.METHOD_GET, patterns, params);
@@ -120,6 +123,7 @@ public class AppController extends Application {
                 segment = segment.addQueryParameter(entry.getKey(), entry.getValue());
             }
         }
+        //添加 API token
         if (requestMethod.equals(Constants.METHOD_GET)) {
             segment = segment.addQueryParameter(Constants.TAG_ACCESS_TOKEN, Constants.CLIENT_ACCESS_TOKEN);
         }

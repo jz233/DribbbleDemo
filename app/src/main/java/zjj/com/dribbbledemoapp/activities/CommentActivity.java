@@ -1,7 +1,6 @@
 package zjj.com.dribbbledemoapp.activities;
 
 import android.content.DialogInterface;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -85,7 +84,7 @@ public class CommentActivity extends EventBusActivity {
         if (!TextUtils.isEmpty(shotsId)) {
             AppController.getInstance().enqueueGetRequest(
                     new String[]{Constants.SHOTS, shotsId, Constants.COMMENTS},
-                    null, "comments",
+                    "comments",
                     new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {
@@ -112,7 +111,7 @@ public class CommentActivity extends EventBusActivity {
                     @Override
                     protected void convert(final CommonViewHolder holder, final Comment comment) {
                         holder.setCircleImageUrl(R.id.iv_user_avatar, comment.getUser().getAvatar_url());
-                        holder.setText(R.id.tv_user_name, comment.getUser().getUsername());
+                        holder.setText(R.id.tv_name, comment.getUser().getUsername());
                         holder.setText(R.id.tv_comment_body, Html.fromHtml(comment.getBody()));
                         holder.setText(R.id.tv_comment_date, DateTimeUtils.parseDateTime(comment.getUpdated_at()));
                         holder.setText(R.id.tv_comment_liked_count, String.valueOf(comment.getLikes_count()));
@@ -216,7 +215,7 @@ public class CommentActivity extends EventBusActivity {
         String[] patterns = {Constants.SHOTS, shotId, Constants.COMMENTS, cmtId, Constants.LIKE};
 
         AppController.getInstance().enqueueGetRequest(
-                patterns, null, Constants.REQ_TAG_CHECK_IF_LIKE_COMMENT,
+                patterns, Constants.REQ_TAG_CHECK_IF_LIKE_COMMENT,
                 new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
@@ -251,6 +250,10 @@ public class CommentActivity extends EventBusActivity {
 
     }
 
+    /**
+     * 处理comment事件
+     * @param event
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleCommentEvent(CommentEvent event) {
         final boolean like = event.like;
@@ -258,6 +261,7 @@ public class CommentActivity extends EventBusActivity {
         final CommonViewHolder holder = event.holder;
 
         String[] item = like ? new String[]{"Unlike this comment"} : new String[]{"Like this comment"};
+        //显示Like/unlike this comment
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .setItems(item, new DialogInterface.OnClickListener() {
                     @Override

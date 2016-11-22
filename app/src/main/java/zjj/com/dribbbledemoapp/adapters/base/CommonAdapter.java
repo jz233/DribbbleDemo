@@ -10,28 +10,28 @@ import java.util.List;
 
 public abstract class CommonAdapter<T> extends RecyclerView.Adapter<CommonViewHolder> {
 
-    protected Context mContext;
-    protected int mLayoutId;
-    protected List<T> mData;
-    protected LayoutInflater mInflater;
+    protected Context context;
+    protected int layoutId;
+    protected List<T> data;
+    protected LayoutInflater inflater;
 
     public CommonAdapter(Context context, int layoutId, List<T> data) {
-        mContext = context;
-        mLayoutId = layoutId;
-        mData = data;
-        mInflater = LayoutInflater.from(context);
+        this.context = context;
+        this.layoutId = layoutId;
+        this.data = data;
+        inflater = LayoutInflater.from(context);
     }
 
     @Override
     public CommonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        CommonViewHolder holder = CommonViewHolder.getViewHolder(mContext, mLayoutId, parent);
+        CommonViewHolder holder = CommonViewHolder.getViewHolder(context, layoutId, parent);
         return holder;
     }
 
     @Override
     public void onBindViewHolder(CommonViewHolder holder, int position) {
 //        holder.updatePosition(position);
-        convert(holder, mData.get(position));
+        convert(holder, data.get(position));
     }
 
     /**
@@ -41,6 +41,6 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<CommonViewHo
 
     @Override
     public int getItemCount() {
-        return mData.size();
+        return data.size();
     }
 }

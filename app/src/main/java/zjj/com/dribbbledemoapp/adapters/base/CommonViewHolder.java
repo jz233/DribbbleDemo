@@ -20,22 +20,22 @@ import zjj.com.dribbbledemoapp.R;
 
 public class CommonViewHolder extends RecyclerView.ViewHolder {
 
-    private Context mContext;
+    private Context context;
     /**
      * item布局整体View对象(可复用)
      */
-    private View mConvertView;
+    private View convertView;
     /**
      * item布局中控件id和View的集合
      */
-    private SparseArray<View> mViews;
+    private SparseArray<View> views;
 
 
     public CommonViewHolder(Context context, View itemView, ViewGroup parent) {
         super(itemView);
-        mContext = context;
-        mConvertView = itemView;
-        mViews = new SparseArray<>();
+        this.context = context;
+        convertView = itemView;
+        views = new SparseArray<>();
     }
 
     /**
@@ -51,10 +51,10 @@ public class CommonViewHolder extends RecyclerView.ViewHolder {
      * 根据id得到item布局中某个控件引用
      */
     public <T extends View> T getView(@IdRes int viewId) {
-        View view = mViews.get(viewId);
+        View view = views.get(viewId);
         if (view == null) {
-            view = mConvertView.findViewById(viewId);
-            mViews.put(viewId, view);
+            view = convertView.findViewById(viewId);
+            views.put(viewId, view);
         }
         return (T) view;
     }
@@ -70,19 +70,22 @@ public class CommonViewHolder extends RecyclerView.ViewHolder {
         view.setImageResource(resId);
         return this;
     }
+
     public CommonViewHolder setCircleImageResource(@IdRes int viewId, @DrawableRes int resId) {
         CircleImageView view = getView(viewId);
         view.setImageResource(resId);
         return this;
     }
+
     public CommonViewHolder setCircleImageUrl(@IdRes int viewId, String url) {
         CircleImageView view = getView(viewId);
-        Picasso.with(mContext).load(url).placeholder(R.drawable.default_avatar).error(R.drawable.default_avatar).into(view);
+        Picasso.with(context).load(url).placeholder(R.drawable.default_avatar).error(R.drawable.default_avatar).into(view);
         return this;
     }
+
     public CommonViewHolder setImageUrl(@IdRes int viewId, String url) {
         ImageView view = getView(viewId);
-        Picasso.with(mContext).load(url).placeholder(R.drawable.placeholder).error(R.drawable.placeholder).into(view);
+        Picasso.with(context).load(url).placeholder(R.drawable.placeholder).error(R.drawable.placeholder).into(view);
         return this;
     }
 
@@ -93,7 +96,7 @@ public class CommonViewHolder extends RecyclerView.ViewHolder {
     }
 
     public CommonViewHolder setOnViewClickListener(View.OnClickListener listener) {
-        mConvertView.setOnClickListener(listener);
+        convertView.setOnClickListener(listener);
         return this;
     }
 
