@@ -120,9 +120,6 @@ public class ShotsListFragment extends BaseFragment {
             @Override
             public void onLoadMore(final int currentPage) {
                 params.put("page", String.valueOf(currentPage));
-//                        //列表最下方添加进度条View
-//                        results.add(null);
-//                        adapter.notifyItemInserted(results.size() - 1);
                 //网络请求读取下一页
                 AppController.getInstance().enqueueGetRequest(
                         new String[]{Constants.SHOTS},
@@ -145,9 +142,6 @@ public class ShotsListFragment extends BaseFragment {
                                 mainHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
-//                                                results.remove(results.size() - 1);
-//                                                adapter.notifyItemRemoved(results.size());  //此时size()已经减少1
-
                                         Shot[] list = new Gson().fromJson(body, Shot[].class);
                                         List<Shot> incResults = Arrays.asList(list);
                                         results.addAll(incResults);

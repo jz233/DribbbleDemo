@@ -48,7 +48,8 @@ public class AppController extends Application {
         Picasso picasso = new Picasso.Builder(instance).downloader(new OkHttp3Downloader(getClient())).listener(new Picasso.Listener() {
             @Override
             public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                Toast.makeText(AppController.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AppController.this, "exception: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+
             }
         }).build();
         Picasso.setSingletonInstance(picasso);

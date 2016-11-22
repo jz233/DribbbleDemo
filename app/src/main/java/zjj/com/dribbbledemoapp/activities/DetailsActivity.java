@@ -297,8 +297,6 @@ public class DetailsActivity extends BaseActivity implements View.OnClickListene
                                 Toast.makeText(context, "load error", Toast.LENGTH_SHORT).show();
                             }
                         });
-            }else{
-                Toast.makeText(context, "succeed", Toast.LENGTH_SHORT).show();
             }
         }else{
             Toast.makeText(context, "Image Url is null", Toast.LENGTH_SHORT).show();

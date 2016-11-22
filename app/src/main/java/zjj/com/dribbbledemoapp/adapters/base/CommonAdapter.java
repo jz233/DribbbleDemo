@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import zjj.com.dribbbledemoapp.listeners.OnLoadMoreListener;
+
 
 public abstract class CommonAdapter<T> extends RecyclerView.Adapter<CommonViewHolder> {
 
@@ -14,12 +16,17 @@ public abstract class CommonAdapter<T> extends RecyclerView.Adapter<CommonViewHo
     protected int layoutId;
     protected List<T> data;
     protected LayoutInflater inflater;
+    private OnLoadMoreListener onLoadMoreListener;
 
     public CommonAdapter(Context context, int layoutId, List<T> data) {
         this.context = context;
         this.layoutId = layoutId;
         this.data = data;
         inflater = LayoutInflater.from(context);
+    }
+
+    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
+        this.onLoadMoreListener = onLoadMoreListener;
     }
 
     @Override
